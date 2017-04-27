@@ -130,3 +130,13 @@ address  = "localhost:2003"
 # then the prefix can be set to anything (including the empty string) since you
 # probably wont care much about "polluting" the namespace.
 prefix   = "freifunk"
+
+[[database.connection.socket]]
+enable   = false
+type     = "tcp"
+address  = ":8081"
+
+[[database.connection.socket]]
+enable   = false
+type     = "unix"
+address  = "/var/lib/collector/database.socket"
