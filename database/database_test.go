@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNow(t *testing.T) {
+func TestRegister(t *testing.T) {
 	assert := assert.New(t)
 	assert.Len(Adapters, 0)
 
