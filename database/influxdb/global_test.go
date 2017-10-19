@@ -2,7 +2,9 @@ package influxdb
 
 import (
 	"testing"
+	"time"
 
+	"github.com/influxdata/influxdb/client/v2"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/FreifunkBremen/yanic/data"
@@ -17,6 +19,32 @@ func TestGlobalStats(t *testing.T) {
 
 	// check fields
 	assert.EqualValues(3, fields["nodes"])
+	conn := &Connection{
+		points: make(chan *client.Point),
+	}
+
+	global := 0
+	model := 0
+	firmware := 0
+	go func() {
+		for p := range conn.points {
+			switch p.Name() {
+			case "global":
+				global++
+				break
+			case "model":
+				model++
+				break
+			default:
+				firmware++
+			}
+		}
+	}()
+	conn.InsertGlobals(stats, time.Now())
+	time.Sleep(time.Millisecond * 100)
+	assert.Equal(1, global)
+	assert.Equal(2, model)
+	assert.Equal(1, firmware)
 }
 
 func createTestNodes() *runtime.Nodes {

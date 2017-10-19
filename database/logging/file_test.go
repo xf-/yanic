@@ -13,15 +13,9 @@ import (
 
 func TestStart(t *testing.T) {
 	assert := assert.New(t)
-	conn, err := Connect(map[string]interface{}{
-		"enable": false,
-	})
-	assert.Nil(conn)
-	assert.Nil(err)
 
-	conn, err = Connect(map[string]interface{}{
-		"enable": true,
-		"path":   "/dev/notexists/file",
+	conn, err := Connect(map[string]interface{}{
+		"path": "/dev/notexists/file",
 	})
 	assert.Nil(conn)
 	assert.Error(err)
@@ -29,8 +23,7 @@ func TestStart(t *testing.T) {
 	path := "/tmp/testlogfile"
 
 	conn, err = Connect(map[string]interface{}{
-		"enable": true,
-		"path":   path,
+		"path": path,
 	})
 
 	dat, _ := ioutil.ReadFile(path)

@@ -39,26 +39,47 @@ func TestStart(t *testing.T) {
 	assert := assert.New(t)
 
 	globalConn := &testConn{}
-	database.RegisterAdapter("a", func(config interface{}) (database.Connection, error) {
+	database.RegisterAdapter("a", func(config map[string]interface{}) (database.Connection, error) {
 		return globalConn, nil
 	})
-	database.RegisterAdapter("b", func(config interface{}) (database.Connection, error) {
+	database.RegisterAdapter("b", func(config map[string]interface{}) (database.Connection, error) {
 		return globalConn, nil
 	})
-	database.RegisterAdapter("c", func(config interface{}) (database.Connection, error) {
+	database.RegisterAdapter("c", func(config map[string]interface{}) (database.Connection, error) {
 		return globalConn, nil
 	})
-	database.RegisterAdapter("d", func(config interface{}) (database.Connection, error) {
+	database.RegisterAdapter("d", func(config map[string]interface{}) (database.Connection, error) {
 		return nil, nil
 	})
-	database.RegisterAdapter("e", func(config interface{}) (database.Connection, error) {
+	database.RegisterAdapter("e", func(config map[string]interface{}) (database.Connection, error) {
 		return nil, errors.New("blub")
 	})
-	allConn, err := Connect(map[string][]interface{}{
-		"a": []interface{}{"a1", "a2"},
+	allConn, err := Connect(map[string]interface{}{
+		"a": []map[string]interface{}{
+			map[string]interface{}{
+				"enable": false,
+				"path":   "a1",
+			},
+			map[string]interface{}{
+				"path": "a2",
+			},
+			map[string]interface{}{
+				"enable": true,
+				"path":   "a3",
+			},
+		},
 		"b": nil,
-		"c": []interface{}{"c1"},
-		"d": []interface{}{"d0"}, // fetch continue command in Connect
+		"c": []map[string]interface{}{
+			map[string]interface{}{
+				"path": "c1",
+			},
+		},
+		// fetch continue command in Connect
+		"d": []map[string]interface{}{
+			map[string]interface{}{
+				"path": "d0",
+			},
+		},
 	})
 	assert.NoError(err)
 
@@ -82,8 +103,17 @@ func TestStart(t *testing.T) {
 	allConn.Close()
 	assert.Equal(3, globalConn.CountClose)
 
-	_, err = Connect(map[string][]interface{}{
-		"e": []interface{}{"give me an error"},
+	_, err = Connect(map[string]interface{}{
+		"e": []map[string]interface{}{
+			map[string]interface{}{},
+		},
 	})
 	assert.Error(err)
+
+	// wrong format -> the only panic in Register
+	assert.Panics(func() {
+		Connect(map[string]interface{}{
+			"e": true,
+		})
+	})
 }

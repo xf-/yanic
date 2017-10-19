@@ -10,7 +10,7 @@ func TestRegister(t *testing.T) {
 	assert := assert.New(t)
 	assert.Len(Adapters, 0)
 
-	RegisterAdapter("blub", func(config interface{}) (Connection, error) {
+	RegisterAdapter("blub", func(config map[string]interface{}) (Connection, error) {
 		return nil, nil
 	})
 

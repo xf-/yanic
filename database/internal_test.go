@@ -29,7 +29,7 @@ func TestStart(t *testing.T) {
 		Database: struct {
 			DeleteInterval runtime.Duration `toml:"delete_interval"`
 			DeleteAfter    runtime.Duration `toml:"delete_after"`
-			Connection     map[string][]interface{}
+			Connection     map[string]interface{}
 		}{
 			DeleteInterval: runtime.Duration{Duration: time.Millisecond * 10},
 		},
