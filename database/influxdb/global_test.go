@@ -1,6 +1,7 @@
 package influxdb
 
 import (
+	"sync"
 	"testing"
 	"time"
 
@@ -26,22 +27,24 @@ func TestGlobalStats(t *testing.T) {
 	global := 0
 	model := 0
 	firmware := 0
+	wg := sync.WaitGroup{}
+	wg.Add(4)
 	go func() {
 		for p := range conn.points {
 			switch p.Name() {
 			case "global":
 				global++
-				break
 			case "model":
 				model++
-				break
 			default:
+				assert.Equal("firmware", p.Name())
 				firmware++
 			}
+			wg.Done()
 		}
 	}()
 	conn.InsertGlobals(stats, time.Now())
-	time.Sleep(time.Millisecond * 100)
+	wg.Wait()
 	assert.Equal(1, global)
 	assert.Equal(2, model)
 	assert.Equal(1, firmware)
